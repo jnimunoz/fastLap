@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="fragments/base :: base('Historial de vueltas', ~{::section})">
+<section class="grid two">
+    <div class="card">
+        <h2>Historial por corredor</h2>
+        <p class="muted">Selecciona un corredor para consultar su desempeño histórico en las carreras.</p>
+        <ul class="lap-list">
+            <li class="lap-item" th:each="runner : ${runners}">
+                <div>
+                    <span th:text="${runner.nickname()}"></span>
+                    <div class="muted">
+                        <span th:text="${runner.firstName()}"></span>
+                        <span th:text="${runner.lastName()}"></span>
+                    </div>
+                </div>
+                <a class="button small secondary" th:href="@{'/history/runners/' + ${runner.id()}}">Ver historial</a>
+            </li>
+            <li th:if="${#lists.isEmpty(runners)}" class="muted">No hay corredores registrados aún.</li>
+        </ul>
+    </div>
+    <div class="card">
+        <h2>Historial por carrera</h2>
+        <p class="muted">Consulta las vueltas registradas en cada sesión de entrenamiento.</p>
+        <ul class="lap-list">
+            <li class="lap-item" th:each="race : ${races}">
+                <div>
+                    <span th:text="${race.name()}"></span>
+                    <div class="muted">
+                        <span th:text="${race.startTime() != null ? #temporals.format(race.startTime(), 'dd MMM yyyy HH:mm') : 'Sin fecha'}"></span>
+                        <span class="badge" th:classappend="${race.status().name() == 'IN_PROGRESS'} ? ' active' : ' completed'"
+                              th:text="${race.status()}"></span>
+                    </div>
+                </div>
+                <a class="button small secondary" th:href="@{'/history/races/' + ${race.id()}}">Ver detalle</a>
+            </li>
+            <li th:if="${#lists.isEmpty(races)}" class="muted">Aún no se han registrado carreras.</li>
+        </ul>
+    </div>
+    <div class="card" th:if="${activeRace != null}">
+        <h2>Carrera en progreso</h2>
+        <p class="muted">Consulta el panel de control para registrar nuevas vueltas.</p>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Nombre</h3>
+                <p th:text="${activeRace.name()}"></p>
+            </div>
+            <div class="stat-card">
+                <h3>Inicio</h3>
+                <p th:text="${activeRace.startTime() != null ? #temporals.format(activeRace.startTime(), 'dd MMM yyyy HH:mm') : 'Sin inicio'}"></p>
+            </div>
+            <div class="stat-card">
+                <h3>Vueltas</h3>
+                <p th:text="${activeRace.totalLaps()}"></p>
+            </div>
+        </div>
+        <div class="actions">
+            <a class="button" th:href="@{/race}">Ir al panel</a>
+        </div>
+    </div>
+</section>
+</html>

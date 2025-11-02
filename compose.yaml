@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastlap-app
+    restart: unless-stopped
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/fastlap?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=fastlap
+      - SPRING_DATASOURCE_PASSWORD=fastlap
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_THYMELEAF_CACHE=true
+      - SERVER_PORT=8080
+    ports:
+      - '8080:8080'
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: 'mysql:8.0'
+    container_name: fastlap-mysql
+    restart: unless-stopped
+    environment:
+      - 'MYSQL_DATABASE=fastlap'
+      - 'MYSQL_PASSWORD=fastlap'
+      - 'MYSQL_ROOT_PASSWORD=fastlaproot'
+      - 'MYSQL_USER=fastlap'
+    ports:
+      - '3306:3306'
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:

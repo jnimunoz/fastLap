@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:fragment="base(pageTitle, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">FastLap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<header class="app-header">
+    <div class="logo">FastLap</div>
+    <nav class="main-nav">
+    <a th:href="@{/race}" th:classappend="${activePage == 'race'} ? ' active' : ''">Carrera</a>
+    <a th:href="@{/runners}" th:classappend="${activePage == 'runners'} ? ' active' : ''">Corredores</a>
+    <a th:href="@{/history}" th:classappend="${activePage == 'history'} ? ' active' : ''">Historial</a>
+    </nav>
+</header>
+<main class="app-main">
+    <div th:if="${successMessage}" class="alert success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}"></div>
+    <div th:replace="${content}"></div>
+</main>
+<footer class="app-footer">
+    <p>&copy; <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}"></span> FastLap Training Circuit</p>
+</footer>
+</body>
+</html>

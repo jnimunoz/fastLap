@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="fragments/base :: base('Historial del corredor', ~{::section})">
+<section class="card">
+    <a class="button small secondary" th:href="@{/history}">⟵ Volver</a>
+    <h2>
+        <span th:text="${history.runner().firstName()}"></span>
+        <span th:text="${history.runner().lastName()}"></span>
+    </h2>
+    <p class="muted">Apodo: <span th:text="${history.runner().nickname()}"></span></p>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Vueltas totales</h3>
+            <p th:text="${history.totalLaps()}"></p>
+        </div>
+        <div class="stat-card">
+            <h3>Mejor vuelta</h3>
+            <p th:text="${history.formattedBestLap() != null ? history.formattedBestLap() : 'N/D'}"></p>
+        </div>
+        <div class="stat-card">
+            <h3>Promedio</h3>
+            <p th:text="${history.formattedAverageLap() != null ? history.formattedAverageLap() : 'N/D'}"></p>
+        </div>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>Carrera</th>
+            <th>#</th>
+            <th>Tiempo</th>
+            <th>Fecha</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="lap : ${history.laps()}">
+            <td th:text="${lap.raceName()}"></td>
+            <td th:text="${lap.lapNumber()}"></td>
+            <td th:text="${lap.formattedLapTime()}"></td>
+            <td th:text="${#temporals.format(lap.recordedAt(), 'dd MMM yyyy HH:mm')}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(history.laps())}">
+            <td colspan="4" class="muted">Aún no hay vueltas registradas para este corredor.</td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</html>
