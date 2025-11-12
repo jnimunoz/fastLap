@@ -22,9 +22,11 @@ pipeline {
             steps {
                 echo 'Desplegando contenedores Docker...'
                 script {
-                    sh 'docker-compose stop app mysql || true'
-                    sh 'docker-compose rm -f app mysql || true'
-                    sh 'docker-compose up -d app mysql'
+                    sh '''
+                        docker stop fastlap-app fastlap-mysql || true
+                        docker rm -f fastlap-app fastlap-mysql || true
+                        docker-compose up -d app mysql
+                    '''
                 }
             }
         }
