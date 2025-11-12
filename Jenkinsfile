@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'fastlap-app'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
-        MAVEN_OPTS = '-Xmx1024m'
     }
     
     stages {
@@ -13,7 +12,8 @@ pipeline {
             steps {
                 echo 'Construyendo imagen Docker...'
                 script {
-                    sh "docker compose build"
+                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").tag('latest')
                 }
             }
         }
@@ -22,7 +22,10 @@ pipeline {
             steps {
                 echo 'Desplegando contenedores Docker...'
                 script {
-                    sh "docker compose up -d"
+                    sh """
+                        docker-compose down || true
+                        docker-compose up -d
+                    """
                 }
             }
         }
