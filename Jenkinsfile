@@ -8,12 +8,39 @@ pipeline {
     }
     
     stages {
+        stage('Checkout') {
+            steps {
+                echo 'Código obtenido desde GitHub'
+                checkout scm
+            }
+        }
+        
+        stage('Build & Test') {
+            steps {
+                echo 'Compilando y ejecutando pruebas con Maven...'
+                sh 'chmod +x mvnw'
+                sh './mvnw clean test'
+            }
+            post {
+                always {
+                    // Publicar resultados de pruebas
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+        
+        stage('Package') {
+            steps {
+                echo 'Empaquetando la aplicación...'
+                sh './mvnw package -DskipTests'
+            }
+        }
         
         stage('Build Docker Image') {
             steps {
                 echo 'Construyendo imagen Docker...'
                 script {
-                    bat "docker compose build"
+                    sh "docker compose build"
                 }
             }
         }
@@ -22,7 +49,7 @@ pipeline {
             steps {
                 echo 'Desplegando contenedores Docker...'
                 script {
-                    bat "docker compose up -d"
+                    sh "docker compose up -d"
                 }
             }
         }
@@ -30,21 +57,20 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 echo 'Archivando artefactos...'
-                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true, allowEmptyArchive: true
             }
         }
     }
     
     post {
         success {
-            echo 'Pipeline ejecutado exitosamente!'
+            echo '✅ Pipeline ejecutado exitosamente!'
         }
         failure {
-            echo 'El pipeline ha fallado.'
+            echo '❌ El pipeline ha fallado.'
         }
         always {
-            echo 'Limpiando workspace...'
-            cleanWs()
+            echo 'Pipeline completado.'
         }
     }
 }
