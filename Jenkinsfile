@@ -8,33 +8,6 @@ pipeline {
     }
     
     stages {
-        stage('Checkout') {
-            steps {
-                echo 'Código obtenido desde GitHub'
-                checkout scm
-            }
-        }
-        
-        stage('Build & Test') {
-            steps {
-                echo 'Compilando y ejecutando pruebas con Maven...'
-                sh 'chmod +x mvnw'
-                sh './mvnw clean test'
-            }
-            post {
-                always {
-                    // Publicar resultados de pruebas
-                    junit '**/target/surefire-reports/*.xml'
-                }
-            }
-        }
-        
-        stage('Package') {
-            steps {
-                echo 'Empaquetando la aplicación...'
-                sh './mvnw package -DskipTests'
-            }
-        }
         
         stage('Build Docker Image') {
             steps {
