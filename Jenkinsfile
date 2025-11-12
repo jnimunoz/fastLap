@@ -12,8 +12,8 @@ pipeline {
             steps {
                 echo 'Construyendo imagen Docker...'
                 script {
-                    docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
-                    docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").tag('latest')
+                    sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
+                    sh 'docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest'
                 }
             }
         }
@@ -22,10 +22,8 @@ pipeline {
             steps {
                 echo 'Desplegando contenedores Docker...'
                 script {
-                    sh """
-                        docker-compose down || true
-                        docker-compose up -d
-                    """
+                    sh 'docker-compose down || true'
+                    sh 'docker-compose up -d'
                 }
             }
         }
