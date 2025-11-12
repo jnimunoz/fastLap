@@ -22,8 +22,9 @@ pipeline {
             steps {
                 echo 'Desplegando contenedores Docker...'
                 script {
-                    sh 'docker-compose down || true'
-                    sh 'docker-compose up -d'
+                    sh 'docker-compose stop app mysql || true'
+                    sh 'docker-compose rm -f app mysql || true'
+                    sh 'docker-compose up -d app mysql'
                 }
             }
         }
