@@ -4,13 +4,87 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'fastlap-app'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
+        CODECOV_TOKEN = '3c83048b-78d6-4b4e-a11a-e1306a36bb51'
     }
     
     stages {
         stage('Checkout') {
             steps {
-                echo 'Obteniendo código desde GitHub...'
+                echo 'Obteniendo codigo desde GitHub...'
                 checkout scm
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                echo 'Configurando permisos de Maven Wrapper...'
+                script {
+                    sh 'chmod +x mvnw'
+                }
+            }
+        }
+        
+        stage('Compile') {
+            steps {
+                echo 'Compilando el proyecto...'
+                script {
+                    sh './mvnw clean compile'
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                echo 'Ejecutando pruebas unitarias...'
+                script {
+                    sh './mvnw test'
+                }
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/*.xml'
+                    echo 'Resultados de tests publicados'
+                }
+                success {
+                    echo 'Todas las pruebas pasaron exitosamente'
+                }
+                failure {
+                    echo 'Algunas pruebas fallaron'
+                }
+            }
+        }
+
+        stage('Code Coverage') {
+            steps {
+                echo 'Generando reporte de cobertura con JaCoCo...'
+                script {
+                    sh './mvnw jacoco:report'
+                }
+                echo 'Subiendo reporte a Codecov...'
+                script {
+                    sh '''
+                        curl -Os https://uploader.codecov.io/latest/linux/codecov
+                        chmod +x codecov
+                        ./codecov -t ${CODECOV_TOKEN} -f target/site/jacoco/jacoco.xml
+                    '''
+                }
+            }
+            post {
+                success {
+                    echo 'Reporte de cobertura generado y enviado a Codecov'
+                }
+                failure {
+                    echo 'Error al generar o enviar reporte de cobertura'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo 'Empaquetando aplicacion...'
+                script {
+                    sh './mvnw package -DskipTests'
+                }
             }
         }
         
@@ -79,6 +153,7 @@ pipeline {
     post {
         success {
             echo 'Pipeline ejecutado exitosamente!'
+            echo 'Revisa el reporte de cobertura en Codecov'
         }
         failure {
             echo 'El pipeline ha fallado.'
