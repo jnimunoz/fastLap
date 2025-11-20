@@ -37,7 +37,7 @@ pipeline {
             steps {
                 echo 'Ejecutando pruebas unitarias...'
                 script {
-                    sh './mvnw test'
+                    sh './mvnw test -Dspring.profiles.active=test'
                 }
             }
             post {
