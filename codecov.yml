@@ -1,0 +1,31 @@
+codecov:
+  require_ci_to_pass: yes
+  notify:
+    wait_for_ci: yes
+
+coverage:
+  precision: 2
+  round: down
+  range: "50...100"
+  
+  status:
+    project:
+      default:
+        target: 50%
+        threshold: 5%
+        if_not_found: success
+    patch:
+      default:
+        target: 50%
+        threshold: 5%
+        if_not_found: success
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
+
+ignore:
+  - "src/test/**"
+  - "**/*Test.java"
+  - "**/*Tests.java"
