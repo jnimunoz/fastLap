@@ -56,25 +56,26 @@ pipeline {
 
         stage('Code Coverage') {
             steps {
-                echo 'Generando reporte de cobertura con JaCoCo...'
+                echo 'Verificando reporte de cobertura...'
                 script {
-                    sh './mvnw jacoco:report'
+                    sh 'ls -la target/site/jacoco/ || echo "Directorio jacoco no encontrado"'
                 }
                 echo 'Subiendo reporte a Codecov...'
                 script {
                     sh '''
                         curl -Os https://uploader.codecov.io/latest/linux/codecov
                         chmod +x codecov
-                        ./codecov -t ${CODECOV_TOKEN} -f target/site/jacoco/jacoco.xml
+                        ./codecov -t ${CODECOV_TOKEN} -f target/site/jacoco/jacoco.xml -v
                     '''
                 }
             }
             post {
                 success {
-                    echo 'Reporte de cobertura generado y enviado a Codecov'
+                    echo 'Reporte de cobertura enviado exitosamente a Codecov!'
+                    echo 'Ver en: https://codecov.io/gh/jnimunoz/fastLap'
                 }
                 failure {
-                    echo 'Error al generar o enviar reporte de cobertura'
+                    echo 'Error al enviar reporte de cobertura'
                 }
             }
         }
